@@ -17,7 +17,13 @@ from django.contrib import admin
 from django.urls import path,include
 from django.conf import settings
 from django.conf.urls.static import static
+from test_api.views import ProductList
+
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('',include('erp_app.urls'))
+    path('',include('erp_app.urls')),
+    path('api/products/', ProductList.as_view()),
+    path('api-auth/', include('rest_framework.urls')),
+    
+    
 ]+ static(settings.MEDIA_URL ,document_root=settings.MEDIA_ROOT)
