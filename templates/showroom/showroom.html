@@ -1,0 +1,67 @@
+
+{% block content %}
+  <h1>Rechercher un produit</h1>
+  <form method="GET">
+    <input type="text" name="search" placeholder="Rechercher un produit">
+    <select name="category">
+      <option value="">Toutes les catégories</option>
+      {% for category, label in product_categories %}
+        <option value="{{ category }}">{{ label }}</option>
+      {% endfor %}
+    </select>
+    <button type="submit">Rechercher</button>
+  </form>
+
+  <h2>Produits</h2>
+  {% if products %}
+    <ul>
+      {% for product in products %}
+        <li>
+          <img src="{{ product.image.url }}" alt="{{ product.name }}">
+          <h3>{{ product.name }}</h3>
+          <p>Prix : {{ product.price }} €</p>
+          <p>Quantité disponible : {{ product.quantity }}</p>
+          <form method="POST" action="{% url 'add_to_cart' %}">
+            {% csrf_token %}
+            <input type="hidden" name="product_id" value="{{ item.product.id }}">
+            <label for="quantity">Quantité souhaitée :</label>
+            <input type="number" name="quantity" min="1" max="{{ product.quantity }}" value="1">
+            <button type="submit">Ajouter au panier</button>
+          </form>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>Aucun produit trouvé.</p>
+  {% endif %}
+
+  <h2>Panier</h2>
+  {% if cart %}
+    <ul>
+      {% for item in cart %}
+        <li>
+          {{ item.product.name }} - Quantité : {{ item.quantity }}
+          <form method="POST" action="{% url 'remove_from_cart' %}">
+            {% csrf_token %}
+            <input type="hidden" name="item_id" value="{{ item.product.id }}">
+            <button type="submit">Supprimer</button>
+        </form>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>Panier vide.</p>
+  {% endif %}
+
+  <h2>Informations client</h2>
+  <form method="POST" action="{% url 'facture' %}">
+    {% csrf_token %}
+    <label for="nom">Nom :</label>
+    <input type="text" name="nom" required>
+    <label for="prenom">Prénom :</label>
+    <input type="text" name="prenom" required>
+    <label for="email">E-mail :</label>
+    <input type="email" name="email" required>
+    <button type="submit">Confirmer la vente</button>
+  </form>
+{% endblock %}

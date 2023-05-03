@@ -1,0 +1,18 @@
+
+{% extends 'base.html' %}
+
+{% block content %}
+  <h1>Facture</h1>
+  <h2>Informations client</h2>
+  <p>Nom : {{ client.nom }}</p>
+  <p>Prénom : {{ client.prenom }}</p>
+  <p>E-mail : {{ client.email }}</p>
+  <h2>Produits</h2>
+  <ul>
+    {% for item in vente.produitvendu_set.all %}
+      <li>{{ item.produit.name }} - Quantité : {{ item.quantite }} - Prix unitaire : {{ item.prix_unitaire }} €</li>
+    {% endfor %}
+  </ul>
+  <h2>Total</h2>
+  <p>{{ vente.total }} €</p>
+{% endblock %}
