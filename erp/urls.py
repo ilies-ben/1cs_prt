@@ -21,7 +21,7 @@ from test_api.views import ProductList
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('',include('erp_app.urls')),
+    path('erp/',include('erp_app.urls')),
     path('api/products/', ProductList.as_view()),
     path('api-auth/', include('rest_framework.urls')),
     

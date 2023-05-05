@@ -1,32 +1,12 @@
 
-from django.contrib import messages
-from .forms import ProductSearchForm, ClientForm
-from django.shortcuts import render, redirect
+from .forms import ProductSearchForm
 from .models import User, Product, Fournisseur
-from django.contrib.auth import logout
-from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse
-import openpyxl
-from django.shortcuts import get_object_or_404, redirect
-from django.contrib import messages
-from django.views.generic import ListView, DetailView
-from django.utils import timezone
-from django.http import HttpResponse
-from django.utils import timezone
-from openpyxl import Workbook
-from django.shortcuts import render, redirect
-from django.contrib import messages
-from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib import messages
-from django.db.models import Q
-from django.shortcuts import render, redirect
-from .models import Product, Client, Vente , ProduitVendu, Stock  
-from .forms import ProductSearchForm, ClientForm
+from .models import Product
+from .forms import ProductSearchForm
 import json
-from django.urls import reverse
 from decimal import Decimal
 from django.shortcuts import render, redirect
-from django.http import HttpResponse
+
 
 
 

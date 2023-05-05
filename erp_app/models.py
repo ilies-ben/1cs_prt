@@ -79,23 +79,6 @@ class Client(models.Model):
     def __str__(self):
         return f"{self.nom} {self.prenom}"
 
-class Vente(models.Model):
-    client = models.ForeignKey(Client, on_delete=models.CASCADE)
-    produits = models.ManyToManyField(Product, through='ProduitVendu')
-    date_vente = models.DateTimeField(auto_now_add=True)
-
-class ProduitVendu(models.Model):
-    vente = models.ForeignKey(Vente, on_delete=models.CASCADE)
-    produit = models.ForeignKey(Product, on_delete=models.CASCADE)
-    quantite = models.IntegerField(validators=[MinValueValidator(1)])
-    prix_unitaire = models.DecimalField(max_digits=8, decimal_places=2)
-
-class Stock(models.Model):
-    produit = models.OneToOneField(Product, on_delete=models.CASCADE)
-    quantite = models.IntegerField(default=0)
-
-    def __str__(self):
-        return f"{self.produit.name} - {self.quantite}"
 
 
 
