@@ -1,7 +1,6 @@
 
 from .forms import ProductSearchForm
-from .models import User, Product, Fournisseur
-from .models import Product
+from .models import *
 from .forms import ProductSearchForm
 import json
 from decimal import Decimal
@@ -21,20 +20,20 @@ def login(request):
         password = request.POST.get('password')
         
         try:
-            user = User.objects.get(username=username, password=password)
-        except User.DoesNotExist:
-            user = None
-        if user:
+            employee = Employee.objects.get(username=username, password=password)
+        except Employee.DoesNotExist:
+            employee = None
+        if employee:
             request.session['is_authenticated'] = True
             request.session['username'] = username
             request.session['password'] = password
-            if user.department == 'meca':
+            if employee.department == 'meca':
                 return render(request,'meca.html')
-            elif user.department == 'elec':
+            elif employee.department == 'elec':
                 return render(request, 'elec.html')
-            elif user.department =='Assemblage':
+            elif employee.department =='Assemblage':
                 return render(request,'Assm.html')
-            elif user.department =='stock':
+            elif employee.department =='stock':
                 return redirect('GS_home')
             else:
                 return render(request,'loginn.html')
