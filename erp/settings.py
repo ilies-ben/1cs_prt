@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-#c)yd1k1798g%yezt0&%8!=lg1musen$8^(t$5n$c4rz6#ey8n
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -40,9 +40,24 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'erp_app',
+    "django.contrib.sites",
+    "corsheaders",
+    "rest_framework.authtoken",
+    "dj_rest_auth",
+    "dj_rest_auth.registration",
+    "allauth",
+    "allauth.account",
+    "allauth.socialaccount",
+    "api",
+    ]
    
     
-]
+CORS_ORIGIN_ALLOW_ALL = True
+CORS_ORIGIN_WHITELIST = (
+    "http://localhost:3000",
+    "http://localhost:8000",
+)
+CSRF_TRUSTED_ORIGINS = ["http://localhost:3000"]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -52,6 +67,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     
 ]
 
@@ -134,3 +150,46 @@ STATICFILES_DIRS= [
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
+SITE_ID = 1
+
+REST_FRAMEWORK={
+    'DEFAULT_PERMISSION_CLASSES':['rest_framework.permissions.IsAuthenticated',],
+
+    'DEFAULT_AUTHENTICATION_CLASSES':['rest_framework.authentication.TokenAuthentication',
+    'rest_framework.authentication.BasicAuthentication',]
+
+}
+REST_AUTH = {
+    'USER_DETAILS_SERIALIZER': 'api.serializers.UserListSerializer',
+    # 'PASSWORD_RESET_SERIALIZER': 'backendapp.serializers.PasswordResetSerializer',
+    # 'PASSWORD_RESET_CONFIRM_SERIALIZER': 'backendapp.serializers.PasswordResetConfirmSerializer',
+    # "TOKEN_SERIALIZER": "backendapp.serializers.OutrunTokenSerializer",
+    "REGISTER_SERIALIZER": "api.serializers.CustomRegisterSerializer",
+}
+
+# for testing: the email will show up in the console
+# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+# for production: it's will send a real email
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+REST_SESSION_LOGIN = False
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_UNIQUE_EMAIL = True
+ACCOUNT_AUTHENTICATION_METHOD = "email"
+ACCOUNT_EMAIL_VERIFICATION = "none"
+ACCOUNT_USERNAME_REQUIRED = False
+
+# Email backend settings for Django
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = "crazyyyfrogggg@gmail.com"
+EMAIL_HOST_PASSWORD = "jaxocijvpjnhsrav"
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+DEFAULT_FROM_EMAIL = 'no-reply@project.com'
+
+AUTH_USER_MODEL = 'erp_app.User'
+
+AUTHENTICATION_BACKENDS = (
+    "allauth.account.auth_backends.AuthenticationBackend",
+    "django.contrib.auth.backends.ModelBackend",
+)
+
