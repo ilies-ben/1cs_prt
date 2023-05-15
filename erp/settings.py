@@ -153,17 +153,18 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 SITE_ID = 1
 
 REST_FRAMEWORK={
-    'DEFAULT_PERMISSION_CLASSES':['rest_framework.permissions.IsAuthenticated',],
-
+    'DEFAULT_PERMISSION_CLASSES':['rest_framework.permissions.AllowAny',],
     'DEFAULT_AUTHENTICATION_CLASSES':['rest_framework.authentication.TokenAuthentication',
     'rest_framework.authentication.BasicAuthentication',]
 
 }
 REST_AUTH = {
     'USER_DETAILS_SERIALIZER': 'api.serializers.UserListSerializer',
-    # 'PASSWORD_RESET_SERIALIZER': 'backendapp.serializers.PasswordResetSerializer',
-    # 'PASSWORD_RESET_CONFIRM_SERIALIZER': 'backendapp.serializers.PasswordResetConfirmSerializer',
-    # "TOKEN_SERIALIZER": "backendapp.serializers.OutrunTokenSerializer",
+    "REGISTER_SERIALIZER": "api.serializers.CustomRegisterSerializer",
+    "TOKEN_SERIALIZER": "api.serializers.TokenSerializer"
+}
+
+REST_AUTH_REGISTER_SERIALIZERS = {
     "REGISTER_SERIALIZER": "api.serializers.CustomRegisterSerializer",
 }
 
