@@ -40,6 +40,8 @@ urlpatterns = [
     path('api/user-checkouts/', views.UserCheckoutsView.as_view(), name='user-checkouts'),
     path('api/create-checkout-with-orders/', views.CreateCheckoutWithOrdersView.as_view(), name='create-checkout-with-orders'),
     path('erp/',include('erp_app.urls')),
+    path('Home/',include('restApi.urls')),
+    path('shipping/',include('shipping.urls'))
     
 ]
 

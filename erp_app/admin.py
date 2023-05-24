@@ -17,4 +17,8 @@ admin.site.register(Product)
 admin.site.register(Order)
 admin.site.register(Checkout)
 admin.site.register(Review)
+admin.site.register(Category),
+admin.site.register(Promotion),
+admin.site.register(Notification),
+
 

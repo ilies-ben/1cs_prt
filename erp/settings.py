@@ -32,7 +32,6 @@ ALLOWED_HOSTS = ['*']
 
 INSTALLED_APPS = [
     'rest_framework',
-    'test_api',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -49,6 +48,9 @@ INSTALLED_APPS = [
     "allauth.account",
     "allauth.socialaccount",
     "api",
+    "restApi",
+    "shipping",
+    'django_filters',
     ]
    
     
@@ -193,3 +195,4 @@ AUTHENTICATION_BACKENDS = (
     "django.contrib.auth.backends.ModelBackend",
 )
 
+OSCAR_SHIPPING_METHODS_CLASS = 'shipping.shipping.Repository'

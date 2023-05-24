@@ -1,6 +1,6 @@
 from django.apps import AppConfig
 
 
-class TestApiConfig(AppConfig):
+class ShippingConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'test_api'
+    name = 'shipping'
