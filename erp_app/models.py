@@ -29,40 +29,6 @@ DEPARTMENTS = [
         ('stock','Gestion de stock'),
 ]
 
-
-"""Email confirmation code model """
-
-class EmailConfirmationCode(models.Model):
-    """
-    Email confirmation code model:
-    to store codes that has been sent to users to validate their emails
-    should be deleted when a user email gets validated
-    """
-
-    user = models.OneToOneField("User", on_delete=models.CASCADE)
-    code = models.CharField(max_length=6)
-    created_on = models.DateTimeField(auto_now_add=True)
-
-    def send_email(self, code):
-        subject = "Email Confirmation"
-        from_email = getattr(settings, "DEFAULT_FROM_EMAIL")
-        to_email = [self.user.email]
-        name = "Outrun"
-        domain = Site.objects.get_current().domain
-        body_html = render_to_string(
-            "email_verification.html",
-            {"code": str(code), "domain": domain, "user": self.user},
-        )
-        send_mail(subject, name, from_email, to_email, html_message=body_html)
-
-    @classmethod
-    def generate_otp(cls, length=6):
-        m = hashlib.sha256()
-        m.update(getattr(settings, "SECRET_KEY", None).encode("utf-8"))
-        m.update(urandom(16))
-        otp = str(int(m.hexdigest(), 16))[-length:]
-        return otp
-
 # phone number validator
     
 phone_regex = RegexValidator(regex=r'^(05|06|07)[0-9]{8}$',
@@ -84,8 +50,9 @@ class CustomUserManager(BaseUserManager):
             )
         
         user.set_password(password)
-        # user.is_staff = False
-        user.is_active=False
+        user.is_active=True
+        user.is_staff=True
+        user.is_superuser=True
         user.save(using=self._db)
         return user
 
