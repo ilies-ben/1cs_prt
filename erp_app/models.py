@@ -5,13 +5,11 @@ from django.core import validators
 from django.urls import reverse
 from django.db import models
 from django.contrib.auth.models import AbstractUser,BaseUserManager
-import datetime
 from django.conf import settings
-import hashlib
-from os import urandom
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from django.contrib.sites.models import Site
+from decimal import Decimal
 
 
 
@@ -240,7 +238,7 @@ class Order(models.Model):
     product=models.ForeignKey(Product,on_delete=models.CASCADE,related_name='orders',related_query_name='order')
     quantity=models.IntegerField(default=1)  
     checkout=models.ForeignKey(Checkout,on_delete=models.CASCADE,related_name='orders',related_query_name='order',blank=True,null=True)
-
+  
     @staticmethod
     def get_all_orders_by_user(user_id): 
         return Order.objects.filter(user=user_id)
@@ -251,14 +249,44 @@ class Order(models.Model):
         verbose_name_plural = "Orders"    
 
     
+# debut models de shiwroom
+
+class Panier(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    quantity = models.PositiveIntegerField(default=1)
+    added_at = models.DateTimeField(auto_now_add=True)
+    
+    def __str__(self):
+        return self.product.name
 
 
 
+class Facture_Showroom(models.Model):
+    nom = models.CharField(max_length=255)
+    prenom = models.CharField(max_length=255)
+    email = models.EmailField()
+    date = models.DateTimeField(auto_now_add=True)
+    Reduction = models.IntegerField(null=True,default=0)
+    Total_price = models.DecimalField(null=True,default=True,decimal_places=2,max_digits=10)
+    Total_p = models.DecimalField(null=True,default=True,decimal_places=2,max_digits=10)
+
+    def save(self, *args, **kwargs):
+        total_price = Decimal('0.00')
+        total_p = Decimal('0.00')
+        paniers = Panier.objects.all()
+        for panier in paniers:
+           
+           quantity=Decimal(panier.quantity)
+           total_p +=Decimal(panier.product.sale_price) *quantity
+           total_price += Decimal(panier.product.sale_price) *quantity
+        
+        total_price -= total_price * Decimal(self.Reduction) / 100
+        self.Total_price = total_price + total_p* Decimal(19/100)
+        self.Total_p =total_p  
+        super().save(*args, **kwargs)
 
 
-
-
-
+# fin models de showroom 
 
     
 

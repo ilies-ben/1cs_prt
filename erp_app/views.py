@@ -111,67 +111,9 @@ def creer_fournisseur(request):
 #shoowroom 
 def showroom(request):
     products = Product.objects.all()
-    form = ProductSearchForm(request.POST or None)
-    cart = request.session.get('cart', [])
-    
-    if isinstance(cart, str):
-        cart = json.loads(cart)
-    
-    total = 0
-    for item in cart:
-        if isinstance(item, dict):
-            product_price = float(item.get('product', {}).get('price', 0))
-            quantity = item.get('quantity', 0)
-            total += product_price * quantity
-    
-    context = {
-        'products': products,
-        'form': form,
-        'cart': cart,
-        'total': total
-    }
+    panier = Panier.objects.all()
+    context = {'products': products, 'panier': panier}
     return render(request, 'showroom/showroom.html', context)
-  
-class DecimalEncoder(json.JSONEncoder):
-    def default(self, obj):
-        if isinstance(obj, Decimal):
-            return float(obj)
-        return super(DecimalEncoder, self).default(obj)
-def add_to_cart(request):
-    if request.method == 'POST':
-        product_id = request.POST.get('product_id')
-        quantity = int(request.POST.get('quantity'))
-        product = Product.objects.get(id=product_id)
-        cart = request.session.get('cart', [])
-        if isinstance(cart, str):
-            cart = json.loads(cart)
-        if not isinstance(cart, list):
-            cart = []
-        cart.append({
-            'product': {
-                'id': product.id,
-                'name': product.name,
-                'price': product.price,
-                'quantity': product.quantity,
-                # ...
-            },
-            'quantity': quantity
-        })
-        request.session['cart'] = json.dumps(cart, cls=DecimalEncoder)
-    return redirect('showroom')
-
-def remove_from_cart(request):
-    if request.method == 'POST':
-        product_id = request.POST.get('product_id')
-        if product_id and product_id.isdigit():
-            product_id = int(product_id)
-            cart = request.session.get('cart', [])
-            new_cart = [item for item in cart if item['product']['id'] != product_id]
-            request.session['cart'] = json.dumps(new_cart, cls=DecimalEncoder)
-    return redirect('showroom')
-
-
-
 def facture(request):
     cart = request.session.get('cart', [])
     total = 0
@@ -193,8 +135,54 @@ def facture(request):
     else:
         return redirect('showroom')
         
+def ajouter_au_panier(request):
+    if request.method == 'POST':
+        product_id = request.POST.get('product_id')
+        quantity = request.POST.get('quantity')
+        product = Product.objects.get(id=product_id)
+        panier = Panier(product=product, quantity=quantity)
+        panier.save()
+    return redirect('showroom')
 
+def supprimer_du_panier(request):
+    if request.method == 'POST':
+        item_id = request.POST.get('item_id')
+        Panier.objects.filter(id=item_id).delete()
+    return redirect('showroom')
 
+def passer_commande(request):
+    if request.method == 'POST':
+        nom = request.POST['nom']
+        prenom = request.POST['prenom']
+        email = request.POST['email']
+        reduction = request.POST['Reduction']
+        facture = Facture_Showroom(
+            nom=nom,
+            prenom=prenom, 
+            email=email,
+            Reduction=reduction,  
+        )
+        facture.save()
+        derniere_facture = Facture_Showroom.objects.latest('id') 
+        panier = Panier.objects.all()
+        derniere_facture_id = derniere_facture.id
+
+        context = {
+            
+            'nom': nom,
+            'prenom':prenom,
+            'email': email,
+            'reduction': reduction,
+            'date': derniere_facture.date,
+            'Total': derniere_facture.Total_p,
+            'panier': panier ,
+            'id': derniere_facture_id, 
+            'TTC': derniere_facture.Total_price,
+
+        }
+        
+        return render(request, 'showroom/facture.html', context)
+    return render(request, 'showroom/facture.html', context)
 
 #fin showroom
 
