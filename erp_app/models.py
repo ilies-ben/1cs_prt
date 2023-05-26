@@ -1,16 +1,18 @@
-from django.core.validators import MinValueValidator
 from django.core.validators import RegexValidator
 from django.utils.translation import gettext_lazy as _
 from django.core import validators
 from django.urls import reverse
 from django.db import models
-from django.contrib.auth.models import AbstractUser,BaseUserManager
+from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.conf import settings
-from django.core.mail import send_mail
-from django.template.loader import render_to_string
-from django.contrib.sites.models import Site
 from decimal import Decimal
-
+from django.core.validators import MinValueValidator, MaxValueValidator
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+import datetime
+import hashlib
+from os import urandom
+from django.utils import timezone
 
 
 # Create your models here.
@@ -211,6 +213,11 @@ class Review(models.Model):
 """ checkout model """
 
 class Checkout(models.Model):
+    SHIPPING_STATES = (
+        ('pending', 'Pending'),
+        ('shipped', 'Shipped'),
+        ('delivered', 'Delivered'),
+    )
     date_checkout= models.DateTimeField(auto_now_add=True)
     complete = models.BooleanField(default=False)
     #subtotal of the order, before shipping fees are added.
@@ -219,6 +226,8 @@ class Checkout(models.Model):
     # store the total cost of the order, including shipping.
     total= models.DecimalField(max_digits=10, decimal_places=2)
     shipping_adress= models.CharField(max_length=200)
+    shipping_state = models.CharField(max_length=20, choices=SHIPPING_STATES, default='pending')
+    tracking_number = models.CharField(max_length=100)
     payment_method=models.CharField(max_length=25)
     STATUS=(
         ('paid', 'paid'),
@@ -288,6 +297,26 @@ class Facture_Showroom(models.Model):
 
 # fin models de showroom 
 
-    
+class Promotion(models.Model):
+    name = models.CharField(max_length=255)
+    start_date = models.DateField()
+    end_date = models.DateField()
+    discount = models.DecimalField(max_digits=5, decimal_places=2, validators=[MinValueValidator(0), MaxValueValidator(1)])
+    def __str__(self):
+        return self.name 
 
+class Category(models.Model):
+    name = models.CharField(max_length=255)
+    description = models.TextField()
+
+    def __str__(self):
+        return self.name 
+
+    
+class Favorite(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"{self.user.username}'s favorite list"
 
