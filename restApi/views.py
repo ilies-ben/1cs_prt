@@ -28,26 +28,26 @@ from rest_framework.permissions import IsAuthenticated
 
 # Product views:
 
-class Productcreate(generics.GenericAPIView):
-    serializer_class = serializer.ProductSerializer
-    queryset = Product.objects.all()
-    permission_classes = [IsAdminOrReadOnly]
+# class Productcreate(generics.GenericAPIView):
+#     serializer_class = serializer.ProductSerializer
+#     queryset = Product.objects.all()
+#     permission_classes = [IsAdminOrReadOnly]
 
-    def get(self, request):
-        # Retrieve all products
-        products = Product.objects.all()
-        serializer = self.serializer_class(products, many=True)
-        return Response(serializer.data)
+#     def get(self, request):
+#         # Retrieve all products
+#         products = Product.objects.all()
+#         serializer = self.serializer_class(products, many=True)
+#         return Response(serializer.data)
     
-    def post(self,request):
-        # Create a new product
-        permission_classes = [IsAdminOrReadOnly]
-        data = request.data
-        serializer = self.serializer_class(data = data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(data = serializer.data)
-        return Response(data = serializer.errors)
+#     def post(self,request):
+#         # Create a new product
+#         permission_classes = [IsAdminOrReadOnly]
+#         data = request.data
+#         serializer = self.serializer_class(data = data)
+#         if serializer.is_valid():
+#             serializer.save()
+#             return Response(data = serializer.data)
+#         return Response(data = serializer.errors)
     
 class ProductDetail(generics.GenericAPIView):
     permission_classes = [IsAdminOrReadOnly]
@@ -162,31 +162,31 @@ class CategoryProductList(generics.ListAPIView):
     
 
 
-class PromotionList(generics.ListCreateAPIView):
-    queryset = Promotion.objects.all()
-    serializer_class = PromotionSerializer
+# class PromotionList(generics.ListCreateAPIView):
+#     queryset = Promotion.objects.all()
+#     serializer_class = PromotionSerializer
 
-    def perform_create(self, serializer):
-        send_notification = self.request.data.get('send_notification')
-        serializer.save()
+#     def perform_create(self, serializer):
+#         send_notification = self.request.data.get('send_notification')
+#         serializer.save()
 
-        if send_notification:
-            message = self.request.data.get('message')
-            recipients = self.request.data.get('recipients', 'all')  # Specify specific recipients or use 'all' for all users
+#         if send_notification:
+#             message = self.request.data.get('message')
+#             recipients = self.request.data.get('recipients', 'all')  # Specify specific recipients or use 'all' for all users
 
-            if recipients == 'all':
-                users = User.objects.all()
-            else:
-                user_ids = recipients.split(',')
-                users = User.objects.filter(id__in=user_ids)
+#             if recipients == 'all':
+#                 users = User.objects.all()
+#             else:
+#                 user_ids = recipients.split(',')
+#                 users = User.objects.filter(id__in=user_ids)
 
-            notifications = []
+#             notifications = []
 
-            for user in users:
-                notification = Notification(recipient=user, message=message)
-                notifications.append(notification)
+#             for user in users:
+#                 notification = Notification(recipient=user, message=message)
+#                 notifications.append(notification)
 
-            Notification.objects.bulk_create(notifications)
+#             Notification.objects.bulk_create(notifications)
 
 
 
@@ -233,49 +233,49 @@ class RemoveFavoriteView(generics.DestroyAPIView):
 
 
 
-class ShippingListAPIView(ListAPIView):
-    serializer_class = ShippingSerializer
-    permission_classes = [IsAuthenticated]
+# class ShippingListAPIView(ListAPIView):
+#     serializer_class = ShippingSerializer
+#     permission_classes = [IsAuthenticated]
 
-    def get_queryset(self):
-        user = self.request.user
-        return Shipping.objects.filter(user=user)
+#     def get_queryset(self):
+#         user = self.request.user
+#         return Shipping.objects.filter(user=user)
 
-class ShippingDetailAPIView(RetrieveAPIView):
-    serializer_class = ShippingSerializer
-    permission_classes = [IsAuthenticated]
-    queryset = Shipping.objects.all()
+# class ShippingDetailAPIView(RetrieveAPIView):
+#     serializer_class = ShippingSerializer
+#     permission_classes = [IsAuthenticated]
+#     queryset = Shipping.objects.all()
 
-class ShippingCreateAPIView(CreateAPIView):
-    serializer_class = ShippingSerializer
-    permission_classes = [IsAuthenticated]
+# class ShippingCreateAPIView(CreateAPIView):
+#     serializer_class = ShippingSerializer
+#     permission_classes = [IsAuthenticated]
 
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+#     def perform_create(self, serializer):
+#         serializer.save(user=self.request.user)
 
-class ShippingUpdateAPIView(UpdateAPIView):
-    serializer_class = ShippingSerializer
-    permission_classes = [IsAuthenticated]
-    queryset = Shipping.objects.all()
-    lookup_field = 'pk'
+# class ShippingUpdateAPIView(UpdateAPIView):
+#     serializer_class = ShippingSerializer
+#     permission_classes = [IsAuthenticated]
+#     queryset = Shipping.objects.all()
+#     lookup_field = 'pk'
 
-class ShippingDeleteAPIView(DestroyAPIView):
-    serializer_class = ShippingSerializer
-    permission_classes = [IsAuthenticated]
-    queryset = Shipping.objects.all()
-    lookup_field = 'pk'
-
-
+# class ShippingDeleteAPIView(DestroyAPIView):
+#     serializer_class = ShippingSerializer
+#     permission_classes = [IsAuthenticated]
+#     queryset = Shipping.objects.all()
+#     lookup_field = 'pk'
 
 
-class ShippingStateUpdateAPIView(APIView):
-    permission_classes = [IsAuthenticated]
 
-    def patch(self, request, pk):
-        shipping = Shipping.objects.get(pk=pk)
-        new_state = request.data.get('state')
-        shipping.update_state(new_state)
-        return Response({'message': 'Shipping state updated successfully.'})
+
+# class ShippingStateUpdateAPIView(APIView):
+#     permission_classes = [IsAuthenticated]
+
+#     def patch(self, request, pk):
+#         shipping = Shipping.objects.get(pk=pk)
+#         new_state = request.data.get('state')
+#         shipping.update_state(new_state)
+#         return Response({'message': 'Shipping state updated successfully.'})
 
 
 

@@ -189,13 +189,8 @@ class Promotion(models.Model):
     discount = models.DecimalField(max_digits=5, decimal_places=2, validators=[MinValueValidator(0), MaxValueValidator(1)])
     def __str__(self):
         return self.name 
-    send_notification = models.BooleanField(default=False)
 
-    def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)
-        if self.send_notification:
-            Notification.objects.create(message=self.name, time=self.start_date)
-   
+    
 
 class Category(models.Model):
     name = models.CharField(max_length=255)
@@ -336,13 +331,13 @@ class Order(models.Model):
 
 
 
-class Notification(models.Model):
-    is_read = models.BooleanField(default=False)
-    message = models.TextField()
-    time = models.DateTimeField(auto_now_add=True)
-    recipient = models.ForeignKey(User, on_delete=models.CASCADE,null=True)
+# class Notification(models.Model):
+#     is_read = models.BooleanField(default=False)
+#     message = models.TextField()
+#     time = models.DateTimeField(auto_now_add=True)
+#     recipient = models.ForeignKey(User, on_delete=models.CASCADE,null=True)
 
-    # promotion = models.ForeignKey(Promotion, on_delete=models.CASCADE, default=None)
+#     # promotion = models.ForeignKey(Promotion, on_delete=models.CASCADE, default=None)
 
 
 
@@ -359,42 +354,42 @@ class Favorite(models.Model):
 
 
 
-class Shipping(models.Model):
-    PENDING = 'Pending'
-    IN_TRANSIT = 'In Transit'
-    ARRIVED = 'Arrived'
-    OUT_FOR_DELIVERY = 'Out for Delivery'
-    DELIVERED = 'Delivered'
+# class Shipping(models.Model):
+#     PENDING = 'Pending'
+#     IN_TRANSIT = 'In Transit'
+#     ARRIVED = 'Arrived'
+#     OUT_FOR_DELIVERY = 'Out for Delivery'
+#     DELIVERED = 'Delivered'
 
-    STATE_CHOICES = (
-        (PENDING, 'Pending'),
-        (IN_TRANSIT, 'In Transit'),
-        (ARRIVED, 'Arrived'),
-        (OUT_FOR_DELIVERY, 'Out for Delivery'),
-        (DELIVERED, 'Delivered'),
-    )
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    order = models.ForeignKey(Order, on_delete=models.CASCADE)
-    address = models.CharField(max_length=255)
-    tracking_number = models.CharField(max_length=100)
-    state = models.CharField(max_length=100, default='Pending',choices=STATE_CHOICES)
+#     STATE_CHOICES = (
+#         (PENDING, 'Pending'),
+#         (IN_TRANSIT, 'In Transit'),
+#         (ARRIVED, 'Arrived'),
+#         (OUT_FOR_DELIVERY, 'Out for Delivery'),
+#         (DELIVERED, 'Delivered'),
+#     )
+#     user = models.ForeignKey(User, on_delete=models.CASCADE)
+#     order = models.ForeignKey(Order, on_delete=models.CASCADE)
+#     address = models.CharField(max_length=255)
+#     tracking_number = models.CharField(max_length=100)
+#     state = models.CharField(max_length=100, default='Pending',choices=STATE_CHOICES)
 
     
-    def update_state(self, new_state):
-        self.state = new_state
-        self.save()
-@receiver(post_save, sender=Shipping)
-def create_shipping_notification(sender, instance, created, **kwargs):
-        if not created:
-            previous_state = Shipping.objects.get(pk=instance.pk).state
-            current_state = instance.state
+#     def update_state(self, new_state):
+#         self.state = new_state
+#         self.save()
+# @receiver(post_save, sender=Shipping)
+# def create_shipping_notification(sender, instance, created, **kwargs):
+#         if not created:
+#             previous_state = Shipping.objects.get(pk=instance.pk).state
+#             current_state = instance.state
 
-            if previous_state != current_state:
-                message = f"The state of your shipping has changed to {current_state}"
-                user = instance.user
+#             if previous_state != current_state:
+#                 message = f"The state of your shipping has changed to {current_state}"
+#                 user = instance.user
 
-                notification = Notification(recipient=user, message=message)
-                notification.save()
+#                 notification = Notification(recipient=user, message=message)
+#                 notification.save()
 
 
     

@@ -49,8 +49,6 @@ INSTALLED_APPS = [
     "allauth.socialaccount",
     "api",
     "restApi",
-    "shipping",
-    'django_filters',
     ]
    
     

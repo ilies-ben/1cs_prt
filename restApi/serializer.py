@@ -1,10 +1,10 @@
 from erp_app.models import *
 from rest_framework import serializers 
 
-class NotificationSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Notification
-        fields ='__all__'
+# class NotificationSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = Notification
+#         fields ='__all__'
 
 
 class PromotionSerializer(serializers.ModelSerializer):
@@ -51,12 +51,12 @@ class FavoriteSerializer(serializers.ModelSerializer):
 
 
 
-class ShippingSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Shipping
-        fields = '__all__'
+# class ShippingSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = Shipping
+#         fields = '__all__'
 
-class ShippingUpdateSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Shipping
-        fields = ['state','address']
+# class ShippingUpdateSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = Shipping
+#         fields = ['state','address']
