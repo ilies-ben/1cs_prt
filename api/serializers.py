@@ -10,6 +10,7 @@ from email_validator import validate_email as VE , EmailNotValidError
 from django.core.validators import RegexValidator
 from django.utils.translation import gettext_lazy as _
 from django.contrib.auth import get_user_model,authenticate
+from dj_rest_auth.models import TokenModel
 
 try:
     from allauth.account.adapter import get_adapter
@@ -17,7 +18,23 @@ try:
 except ImportError:
     raise ImportError('allauth needs to be added to INSTALLED_APPS.')
 
+from dj_rest_auth.serializers import TokenSerializer
+
+
 user=get_user_model()
+
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = user
+        exclude = ("password","groups", "user_permissions")
+
+class TokenSerializer(TokenSerializer):
+    user = UserSerializer(read_only=True)
+
+    class Meta:
+        model = TokenModel
+        fields = ('key', 'user')
 
 # Custom registration serializer
 # django-rest-auth’s default register serializer (RegisterSerializer) only recognizes fields for django built-in user model
@@ -77,26 +94,16 @@ class CustomRegisterSerializer(RegisterSerializer):
             'password1': self.validated_data.get('password1', ''),
             'password2': self.validated_data.get('password2', ''),
             'date_of_birth': self.validated_data.get('date_of_birth', ''),
-            'sex': self.validated_data.get('date_of_birth', ''),
+            'sex': self.validated_data.get('sex', ''),
         }
     # save a user instance
     def save(self, request):
         user = super().save(request)
         self.cleaned_data = self.get_cleaned_data()
-        user.phone = self.cleaned_data.phone
-        user.sex = self.cleaned_data.sex
-        user.date_of_birth = self.cleaned_data.date_of_birth
+        user.phone = self.cleaned_data['phone']
+        user.sex = self.cleaned_data['sex']
+        user.date_of_birth = self.cleaned_data['date_of_birth']
         user.save()
-        # prepare code email confirmation
-        emailCodeConfirmation = EmailConfirmationCode()
-        emailCodeConfirmation.user = user
-        # generate code
-        code = EmailConfirmationCode.generate_otp()
-        emailCodeConfirmation.code = str(code)
-        # save the code
-        emailCodeConfirmation.save()
-        # send code email to user
-        emailCodeConfirmation.send_email(code)
         return user
 
 class CustomLoginSerializer(LoginSerializer):
@@ -131,11 +138,6 @@ class UserListSerializer(serializers.ModelSerializer):
             "email",
             "date_joined",
         ]
-        exclude = ("password","groups", "user_permissions")
-
-class UserSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = user
         exclude = ("password","groups", "user_permissions")
 
 class ProductSerializer(serializers.ModelSerializer):

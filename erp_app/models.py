@@ -1,22 +1,18 @@
 from django.core.validators import RegexValidator
 from django.utils.translation import gettext_lazy as _
-from django.core.validators import MinValueValidator, MaxValueValidator
-from django.db.models.signals import post_save
-from django.dispatch import receiver
 from django.core import validators
 from django.urls import reverse
 from django.db import models
-from django.contrib.auth.models import AbstractUser,BaseUserManager
-import datetime
+from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.conf import settings
+from decimal import Decimal
+from django.core.validators import MinValueValidator, MaxValueValidator
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+import datetime
 import hashlib
 from os import urandom
-from django.core.mail import send_mail
-from django.template.loader import render_to_string
-from django.contrib.sites.models import Site
 from django.utils import timezone
-
-
 
 
 # Create your models here.
@@ -28,40 +24,6 @@ DEPARTMENTS = [
         ('Agent_showroom','Showroom'),
         ('stock','Gestion de stock'),
 ]
-
-
-"""Email confirmation code model """
-
-class EmailConfirmationCode(models.Model):
-    """
-    Email confirmation code model:
-    to store codes that has been sent to users to validate their emails
-    should be deleted when a user email gets validated
-    """
-
-    user = models.OneToOneField("User", on_delete=models.CASCADE)
-    code = models.CharField(max_length=6)
-    created_on = models.DateTimeField(auto_now_add=True)
-
-    def send_email(self, code):
-        subject = "Email Confirmation"
-        from_email = getattr(settings, "DEFAULT_FROM_EMAIL")
-        to_email = [self.user.email]
-        name = "Outrun"
-        domain = Site.objects.get_current().domain
-        body_html = render_to_string(
-            "email_verification.html",
-            {"code": str(code), "domain": domain, "user": self.user},
-        )
-        send_mail(subject, name, from_email, to_email, html_message=body_html)
-
-    @classmethod
-    def generate_otp(cls, length=6):
-        m = hashlib.sha256()
-        m.update(getattr(settings, "SECRET_KEY", None).encode("utf-8"))
-        m.update(urandom(16))
-        otp = str(int(m.hexdigest(), 16))[-length:]
-        return otp
 
 # phone number validator
     
@@ -84,8 +46,9 @@ class CustomUserManager(BaseUserManager):
             )
         
         user.set_password(password)
-        # user.is_staff = False
-        user.is_active=False
+        user.is_active=True
+        user.is_staff=True
+        user.is_superuser=True
         user.save(using=self._db)
         return user
 
@@ -181,30 +144,18 @@ class Fournisseur(models.Model):
         return f"{self.nom} {self.prenom}"
 
 
-
-class Promotion(models.Model):
-    name = models.CharField(max_length=255)
-    start_date = models.DateField()
-    end_date = models.DateField()
-    discount = models.DecimalField(max_digits=5, decimal_places=2, validators=[MinValueValidator(0), MaxValueValidator(1)])
-    def __str__(self):
-        return self.name 
-
-    
-
-class Category(models.Model):
-    name = models.CharField(max_length=255)
-    description = models.TextField()
-
-    def __str__(self):
-        return self.name 
-
 """ Product model """
 
 class Product(models.Model):
     name = models.CharField(max_length=30)
-    category = models.ForeignKey(Category, on_delete=models.CASCADE)
-
+    CATEGORIES = [
+        ('Velo', 'Vélo'),
+        ('e-velo', 'Vélo électrique'),
+        ('e-scotter', 'Scooter électrique'),
+        ('Accessoires', 'Accessoires'),
+        ('Matiere 1 ere', 'matiere 1 ere'),
+    ]
+    category = models.CharField(max_length=30, null=True, choices=CATEGORIES)
     description = models.TextField()
     image = models.ImageField(upload_to='produits_images/', default='produits_images/photo_non_dispo.png')
     quantity = models.IntegerField(default=0)
@@ -304,14 +255,11 @@ class Checkout(models.Model):
 """ order model """
 
 class Order(models.Model):
-
-  
     user=models.ForeignKey(User,on_delete=models.CASCADE)
     product=models.ForeignKey(Product,on_delete=models.CASCADE,related_name='orders',related_query_name='order')
     quantity=models.IntegerField(default=1)  
     checkout=models.ForeignKey(Checkout,on_delete=models.CASCADE,related_name='orders',related_query_name='order',blank=True,null=True)
-   
-
+  
     @staticmethod
     def get_all_orders_by_user(user_id): 
         return Order.objects.filter(user=user_id)
@@ -321,85 +269,66 @@ class Order(models.Model):
     class Meta:
         verbose_name_plural = "Orders"    
 
+    
+# debut models de shiwroom
+
+class Panier(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    quantity = models.PositiveIntegerField(default=1)
+    added_at = models.DateTimeField(auto_now_add=True)
+    
+    def __str__(self):
+        return self.product.name
 
 
 
+class Facture_Showroom(models.Model):
+    nom = models.CharField(max_length=255)
+    prenom = models.CharField(max_length=255)
+    email = models.EmailField()
+    date = models.DateTimeField(auto_now_add=True)
+    Reduction = models.IntegerField(null=True,default=0)
+    Total_price = models.DecimalField(null=True,default=True,decimal_places=2,max_digits=10)
+    Total_p = models.DecimalField(null=True,default=True,decimal_places=2,max_digits=10)
+
+    def save(self, *args, **kwargs):
+        total_price = Decimal('0.00')
+        total_p = Decimal('0.00')
+        paniers = Panier.objects.all()
+        for panier in paniers:
+           
+           quantity=Decimal(panier.quantity)
+           total_p +=Decimal(panier.product.sale_price) *quantity
+           total_price += Decimal(panier.product.sale_price) *quantity
+        
+        total_price -= total_price * Decimal(self.Reduction) / 100
+        self.Total_price = total_price + total_p* Decimal(19/100)
+        self.Total_p =total_p  
+        super().save(*args, **kwargs)
 
 
+# fin models de showroom 
 
+class Promotion(models.Model):
+    name = models.CharField(max_length=255)
+    start_date = models.DateField()
+    end_date = models.DateField()
+    discount = models.DecimalField(max_digits=5, decimal_places=2, validators=[MinValueValidator(0), MaxValueValidator(1)])
+    def __str__(self):
+        return self.name 
 
+class Category(models.Model):
+    name = models.CharField(max_length=255)
+    description = models.TextField()
 
-
-
-
-# class Notification(models.Model):
-#     is_read = models.BooleanField(default=False)
-#     message = models.TextField()
-#     time = models.DateTimeField(auto_now_add=True)
-#     recipient = models.ForeignKey(User, on_delete=models.CASCADE,null=True)
-
-#     # promotion = models.ForeignKey(Promotion, on_delete=models.CASCADE, default=None)
-
-
+    def __str__(self):
+        return self.name 
 
     
-
 class Favorite(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
 
     def __str__(self):
         return f"{self.user.username}'s favorite list"
-
-    
-
-
-
-# class Shipping(models.Model):
-#     PENDING = 'Pending'
-#     IN_TRANSIT = 'In Transit'
-#     ARRIVED = 'Arrived'
-#     OUT_FOR_DELIVERY = 'Out for Delivery'
-#     DELIVERED = 'Delivered'
-
-#     STATE_CHOICES = (
-#         (PENDING, 'Pending'),
-#         (IN_TRANSIT, 'In Transit'),
-#         (ARRIVED, 'Arrived'),
-#         (OUT_FOR_DELIVERY, 'Out for Delivery'),
-#         (DELIVERED, 'Delivered'),
-#     )
-#     user = models.ForeignKey(User, on_delete=models.CASCADE)
-#     order = models.ForeignKey(Order, on_delete=models.CASCADE)
-#     address = models.CharField(max_length=255)
-#     tracking_number = models.CharField(max_length=100)
-#     state = models.CharField(max_length=100, default='Pending',choices=STATE_CHOICES)
-
-    
-#     def update_state(self, new_state):
-#         self.state = new_state
-#         self.save()
-# @receiver(post_save, sender=Shipping)
-# def create_shipping_notification(sender, instance, created, **kwargs):
-#         if not created:
-#             previous_state = Shipping.objects.get(pk=instance.pk).state
-#             current_state = instance.state
-
-#             if previous_state != current_state:
-#                 message = f"The state of your shipping has changed to {current_state}"
-#                 user = instance.user
-
-#                 notification = Notification(recipient=user, message=message)
-#                 notification.save()
-
-
-    
-
-
-
-
-
-
-    
-
 

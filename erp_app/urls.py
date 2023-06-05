@@ -13,11 +13,10 @@ urlpatterns = [
     
     # espace showroom
     path('showroom/', views.showroom, name='showroom'),
-    path('add_to_cart/', views.add_to_cart, name='add_to_cart'),
-    path('remove_from_cart/', views.remove_from_cart, name='remove_from_cart'),
-    path('facture/', views.facture, name='facture'),
- 
-  
+     path('ajouter_au_panier/', views.ajouter_au_panier, name='ajouter_au_panier'),
+     path('supprimer_du_panier/', views.supprimer_du_panier, name='supprimer_du_panier'),
+    
+    path('showroom/facture', views.passer_commande, name='passer_commande'),
     #Fin pages de gestion de stock
     path('deco/', views.deco, name='deco'),
     
