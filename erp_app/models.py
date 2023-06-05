@@ -336,20 +336,7 @@ class Facture_Showroom(models.Model):
 
 # fin models de showroom 
 
-class Promotion(models.Model):
-    name = models.CharField(max_length=255)
-    start_date = models.DateField()
-    end_date = models.DateField()
-    discount = models.DecimalField(max_digits=5, decimal_places=2, validators=[MinValueValidator(0), MaxValueValidator(1)])
-    def __str__(self):
-        return self.name 
 
-class Category(models.Model):
-    name = models.CharField(max_length=255)
-    description = models.TextField()
-
-    def __str__(self):
-        return self.name 
 
     
 class Favorite(models.Model):
