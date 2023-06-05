@@ -304,8 +304,14 @@ class Checkout(models.Model):
 """ order model """
 
 class Order(models.Model):
+    SHIPPING_STATES = (
+        ('pending', 'Pending'),
+        ('shipped', 'Shipped'),
+        ('delivered', 'Delivered'),
+    )
 
-  
+    shipping_state = models.CharField(max_length=20, choices=SHIPPING_STATES, default='pending')
+
     user=models.ForeignKey(User,on_delete=models.CASCADE)
     product=models.ForeignKey(Product,on_delete=models.CASCADE,related_name='orders',related_query_name='order')
     quantity=models.IntegerField(default=1)  
