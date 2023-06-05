@@ -182,6 +182,7 @@ class Fournisseur(models.Model):
 
 
 
+
 class Promotion(models.Model):
     name = models.CharField(max_length=255)
     start_date = models.DateField()
@@ -191,6 +192,7 @@ class Promotion(models.Model):
         return self.name 
 
     
+
 
 class Category(models.Model):
     name = models.CharField(max_length=255)
@@ -203,6 +205,7 @@ class Category(models.Model):
 
 class Product(models.Model):
     name = models.CharField(max_length=30)
+
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
 
     description = models.TextField()
