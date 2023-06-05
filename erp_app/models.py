@@ -160,8 +160,6 @@ class Product(models.Model):
     image = models.ImageField(upload_to='produits_images/', default='produits_images/photo_non_dispo.png')
     quantity = models.IntegerField(default=0)
     price = models.DecimalField(max_digits=8, decimal_places=2, default=0)
-    discount=models.IntegerField()
-    sale_price=models.DecimalField(max_digits=10,decimal_places=2)
     created = models.DateField(auto_now_add=True)
     updated = models.DateField(auto_now=True)
     available=models.BooleanField(default=True)
@@ -179,6 +177,20 @@ class Product(models.Model):
             return f"{self.name} , fournisseur : {self.fournisseur.nom } {self.fournisseur.prenom}"
         else:
             return self.name
+        
+    promotion = models.ForeignKey(Promotion, null=True, blank=True, on_delete=models.SET_NULL)
+
+    def get_discounted_price(self):
+        if self.promotion:
+            return self.price - (self.price * self.promotion.discount)
+        else:
+            return self.price
+    # def save(self, *args, **kwargs):
+    #     self.discount = self.get_discounted_price()
+    #     super().save(*args, **kwargs)
+
+    def __str__(self):
+        return self.name 
     class Meta:
         verbose_name_plural = "Products"         
     
