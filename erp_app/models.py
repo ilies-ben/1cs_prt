@@ -144,18 +144,36 @@ class Fournisseur(models.Model):
         return f"{self.nom} {self.prenom}"
 
 
+
+
+
+class Promotion(models.Model):
+    name = models.CharField(max_length=255)
+    start_date = models.DateField()
+    end_date = models.DateField()
+    discount = models.DecimalField(max_digits=5, decimal_places=2, validators=[MinValueValidator(0), MaxValueValidator(1)])
+    def __str__(self):
+        return self.name 
+
+    
+
+
+class Category(models.Model):
+    name = models.CharField(max_length=255)
+    description = models.TextField()
+
+    def __str__(self):
+        return self.name 
+
+
 """ Product model """
 
 class Product(models.Model):
     name = models.CharField(max_length=30)
-    CATEGORIES = [
-        ('Velo', 'Vélo'),
-        ('e-velo', 'Vélo électrique'),
-        ('e-scotter', 'Scooter électrique'),
-        ('Accessoires', 'Accessoires'),
-        ('Matiere 1 ere', 'matiere 1 ere'),
-    ]
-    category = models.CharField(max_length=30, null=True, choices=CATEGORIES)
+
+
+    category = models.ForeignKey(Category, on_delete=models.CASCADE)
+
     description = models.TextField()
     image = models.ImageField(upload_to='produits_images/', default='produits_images/photo_non_dispo.png')
     quantity = models.IntegerField(default=0)
@@ -255,6 +273,15 @@ class Checkout(models.Model):
 """ order model """
 
 class Order(models.Model):
+
+    SHIPPING_STATES = (
+        ('pending', 'Pending'),
+        ('shipped', 'Shipped'),
+        ('delivered', 'Delivered'),
+    )
+
+    shipping_state = models.CharField(max_length=20, choices=SHIPPING_STATES, default='pending')
+
     user=models.ForeignKey(User,on_delete=models.CASCADE)
     product=models.ForeignKey(Product,on_delete=models.CASCADE,related_name='orders',related_query_name='order')
     quantity=models.IntegerField(default=1)  
