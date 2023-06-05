@@ -60,3 +60,10 @@ class FavoriteSerializer(serializers.ModelSerializer):
 #     class Meta:
 #         model = Shipping
 #         fields = ['state','address']
+
+
+
+class PasswordChangeSerializer(serializers.Serializer):
+    old_password = serializers.CharField(required=True)
+    new_password = serializers.CharField(required=True)
+    confirm_password = serializers.CharField(required=True)

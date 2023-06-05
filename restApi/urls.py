@@ -3,12 +3,12 @@ from . import views
 from .views import *
 
 urlpatterns = [
-    # path('get/',views.Productcreate.as_view(),name ='get'),
-    # path('create/',views.Productcreate.as_view(),name ='create'),
-    path('get/<int:id>/', views.ProductDetail.as_view(), name=' get product_detail'),
+    path('all-products/',views.Productcreate.as_view(),name ='get'),
+     path('create/',views.Productcreate.as_view(),name ='create'),
+    path('product/<int:id>/', views.ProductDetail.as_view(), name=' get product_detail'),
     path('update/<int:id>/', views.ProductDetail.as_view(), name=' update product_detail'),
     path('delete/<int:id>/', views.ProductDetail.as_view(), name=' delete product_detail'),
-    path('categories/<str:category>', views.FilterProductsView.as_view(), name='list_categories'), # Retrieve all products by category
+    path('categories/<str:name>', views.FilterProductsView.as_view(), name='list_categories'), # Retrieve all products by category
 
     path('products/',views.FilterProductsByPrice.as_view(),name='filter_price'), #filtring by price 
     path('search/',views.SearchProducts.as_view(),name='Search'),
@@ -27,6 +27,9 @@ urlpatterns = [
     
     path('orders/history/', OrderHistoryView.as_view(), name='order-history'),
     path('MyShippings/', ShippingHistoryView.as_view(), name='shipping-history'),
+    path('user-profile/', UserProfileDetailView.as_view(), name='user-profile'),
+    path('change-password/', ChangePasswordView.as_view(), name='change-password'),
+    path('recommended-products/', RecommendedProductsView.as_view(), name='recommended-products'),
     
     
     
