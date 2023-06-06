@@ -25,11 +25,14 @@ urlpatterns = [
     # path('shipping/<int:pk>/delete/', ShippingDeleteAPIView.as_view(), name='shipping-delete'),
     # path('shipping/<int:pk>/update-state/', ShippingStateUpdateAPIView.as_view(), name='shipping-update-state'),
     
-    path('orders/history/', OrderHistoryView.as_view(), name='order-history'),
-    path('MyShippings/', ShippingHistoryView.as_view(), name='shipping-history'),
+    path('orders/Deliveredhistory/', OrderDeliveredHistoryView.as_view(), name='order-history'),
+    path('orders/Pendinghistory/', OrderPendingHistoryView.as_view(), name='order-history'),
+
+    # path('MyShippings/', ShippingHistoryView.as_view(), name='shipping-history'),
     path('user-profile/', UserProfileDetailView.as_view(), name='user-profile'),
     path('change-password/', ChangePasswordView.as_view(), name='change-password'),
     path('recommended-products/', RecommendedProductsView.as_view(), name='recommended-products'),
+    path('check-authentication/', CheckAuthenticationView.as_view(), name='check-authentication'),
     
     
     

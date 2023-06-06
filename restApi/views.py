@@ -286,27 +286,36 @@ class RemoveFavoriteView(generics.DestroyAPIView):
 
 
 
-class OrderHistoryView(ListAPIView):
+class OrderDeliveredHistoryView(ListAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = OrderSerializer
     
     def get_queryset(self):
         user = self.request.user
-        queryset = Order.objects.filter(user=user, checkout__shipping_state='delivered').select_related('checkout') | Order.objects.filter(user=user)
+        queryset = Order.objects.filter(user=user, shipping_state='delivered')
+        return queryset
+    
+class OrderPendingHistoryView(ListAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = OrderSerializer
+    
+    def get_queryset(self):
+        user = self.request.user
+        queryset = Order.objects.filter(user=user, shipping_state='pending')
         return queryset
     
   
 
 
-class ShippingHistoryView(generics.ListAPIView):
-    serializer_class = OrderSerializer
+# class ShippingHistoryView(generics.ListAPIView):
+#     serializer_class = OrderSerializer
 
-    def get_queryset(self):
-        state = self.request.query_params.get('shipping_state', None)
-        queryset = Order.objects.all()
-        if state is not None:
-            queryset = queryset.filter(checkout__shipping_state=state)
-        return queryset
+#     def get_queryset(self):
+#         state = self.request.query_params.get('shipping_state', None)
+#         queryset = Order.objects.all()
+#         if state is not None:
+#             queryset = queryset.filter(checkout__shipping_state=state)
+#         return queryset
 
 
 
@@ -360,3 +369,9 @@ class RecommendedProductsView(ListAPIView):
         # recommended_products = recommended_products.annotate(num_purchases=count('order.quantity')).order_by('-num_purchases')
 
         return recommended_products
+
+
+class CheckAuthenticationView(APIView):
+    def get(self, request, format=None):
+        authenticated = request.user.is_authenticated
+        return Response({'authenticated': authenticated})

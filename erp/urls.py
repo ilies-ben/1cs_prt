@@ -14,11 +14,45 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
+from rest_framework import permissions
+from drf_yasg.views import get_schema_view
+from drf_yasg import openapi
 from django.urls import path,include
 from django.conf import settings
 from api import views
 from rest_framework.routers import DefaultRouter
 from django.conf.urls.static import static
+
+schema_view = get_schema_view(
+   openapi.Info(
+      title="API Docs",
+      default_version='v1',
+      description="Test description",
+      terms_of_service="https://www.google.com/policies/terms/",
+      contact=openapi.Contact(email="contact@snippets.local"),
+      license=openapi.License(name="BSD License"),
+   ),
+   public=True,
+   permission_classes=[permissions.AllowAny],
+)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 router = DefaultRouter()
 router.register(r'users', views.UserViewSet, basename='user')
 router.register(r'products', views.ProductViewSet, basename='product')
@@ -27,6 +61,10 @@ router.register(r'checkouts', views.CheckoutViewSet, basename='checkout')
 router.register(r'orders', views.OrderViewSet, basename='order')
 
 urlpatterns = [
+
+
+
+
     path("admin/", admin.site.urls),
     # include viewsets routes
     path("api/", include(router.urls)),
@@ -38,9 +76,11 @@ urlpatterns = [
 
     
     path('erp/',include('erp_app.urls')),
-    path('api/',include('restApi.urls')),
-    
-]
+    path('api/',include('restApi.urls')), 
+
+
+    path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
+    ]
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
