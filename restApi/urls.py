@@ -28,8 +28,10 @@ urlpatterns = [
     path('orders/history/', OrderHistoryView.as_view(), name='order-history'),
     path('MyShippings/', ShippingHistoryView.as_view(), name='shipping-history'),
     
-    
-    
+    path('paypal-config/', PayPalConfigView.as_view(), name='paypal-config'),
+    path('initiate-payment/', InitiatePaymentView.as_view(), name='initiate_payment'),
+    path('verify-payment/', VerifyPaymentView.as_view(), name='verify_payment'),
+
     ]
 
 
