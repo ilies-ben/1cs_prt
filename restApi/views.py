@@ -304,8 +304,8 @@ class OrderDeliveredHistoryView(ListAPIView):
     
     def get_queryset(self):
         user = self.request.user
-        queryset = Order.objects.filter(user=user, shipping_state= "delivered")
-        print(queryset)
+        queryset = Order.objects.filter(user=user,  checkout__shipping_state= "delivered").select_related('checkout') 
+        print(Order.checkout)
         return queryset
     
 class OrderPendingHistoryView(ListAPIView):
@@ -314,7 +314,7 @@ class OrderPendingHistoryView(ListAPIView):
     
     def get_queryset(self):
         user = self.request.user
-        queryset = Order.objects.filter(user=user, shipping_state='pending')
+        queryset = Order.objects.filter(user=user, checkout__shipping_state='pending').select_related('checkout')
         return queryset
     
   

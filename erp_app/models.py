@@ -248,6 +248,8 @@ class Checkout(models.Model):
         ('shipped', 'Shipped'),
         ('delivered', 'Delivered'),
     )
+    shipping_state = models.CharField(max_length=20, choices=SHIPPING_STATES, default='pending')
+
     date_checkout= models.DateTimeField(auto_now_add=True)
     complete = models.BooleanField(default=False)
     #subtotal of the order, before shipping fees are added.
@@ -274,13 +276,7 @@ class Checkout(models.Model):
 
 class Order(models.Model):
 
-    SHIPPING_STATES = (
-        ('pending', 'Pending'),
-        ('shipped', 'Shipped'),
-        ('delivered', 'Delivered'),
-    )
-
-    shipping_state = models.CharField(max_length=20, choices=SHIPPING_STATES, default='pending')
+    
 
     user=models.ForeignKey(User,on_delete=models.CASCADE)
     product=models.ForeignKey(Product,on_delete=models.CASCADE,related_name='orders',related_query_name='order')
