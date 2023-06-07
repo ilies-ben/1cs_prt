@@ -32,26 +32,26 @@ import uuid
 
 # Product views:
 
-# class Productcreate(generics.GenericAPIView):
-#     serializer_class = serializer.ProductSerializer
-#     queryset = Product.objects.all()
-#     permission_classes = [IsAdminOrReadOnly]
+class Productcreate(generics.GenericAPIView):
+    serializer_class = serializer.ProductSerializer
+    queryset = Product.objects.all()
+    permission_classes = [IsAdminOrReadOnly]
 
-#     def get(self, request):
-#         # Retrieve all products
-#         products = Product.objects.all()
-#         serializer = self.serializer_class(products, many=True)
-#         return Response(serializer.data)
+    def get(self, request):
+        # Retrieve all products
+        products = Product.objects.all()
+        serializer = self.serializer_class(products, many=True)
+        return Response(serializer.data)
     
-#     def post(self,request):
-#         # Create a new product
-#         permission_classes = [IsAdminOrReadOnly]
-#         data = request.data
-#         serializer = self.serializer_class(data = data)
-#         if serializer.is_valid():
-#             serializer.save()
-#             return Response(data = serializer.data)
-#         return Response(data = serializer.errors)
+    def post(self,request):
+        # Create a new product
+        permission_classes = [IsAdminOrReadOnly]
+        data = request.data
+        serializer = self.serializer_class(data = data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(data = serializer.data)
+        return Response(data = serializer.errors)
     
 class ProductDetail(generics.GenericAPIView):
     permission_classes = [IsAdminOrReadOnly]
@@ -94,13 +94,12 @@ class ProductDetail(generics.GenericAPIView):
 # Product filtering views:
 
 class FilterProductsView(generics.GenericAPIView):
-    serializer_class = ProductSerializer
+    serializer_class = serializer.ProductSerializer
 
     def get_queryset(self):
         # Retrieve all products by category
-        category = self.kwargs['category']
-        queryset = Product.objects.filter(category=category)
-
+        category_name = self.kwargs['name']
+        queryset = Product.objects.filter(category__name=category_name)
         return queryset
     
     def get(self, request, *args, **kwargs):
@@ -153,7 +152,7 @@ class CategoryList(generics.ListCreateAPIView):
     serializer_class = CategorySerializer
     permission_classes = [IsAdminOrReadOnly]
 
-class CategoryDetail(generics.RetrieveUpdateDestroyAPIView):
+class CategoryDetail(RetrieveAPIView):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
 
@@ -200,28 +199,34 @@ class CategoryProductList(generics.ListAPIView):
 
 class AddFavoriteView(generics.CreateAPIView):
     serializer_class = FavoriteSerializer
-    authentication_classes = [SessionAuthentication, BasicAuthentication]
     permission_classes = [IsAuthenticated]
 
     def post(self, request, *args, **kwargs):
-        product_id = request.data.get('product_id')
+        product_id = request.data.get('product')
         if Favorite.objects.filter(user=request.user, product_id=product_id).exists():
             return Response({"message": "This product is already in your favorites list."}, status=status.HTTP_400_BAD_REQUEST)
+        
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save(user=request.user)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
+
+
 class RemoveFavoriteView(generics.DestroyAPIView):
     queryset = Favorite.objects.all()
-    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    serializer_class = FavoriteSerializer
     permission_classes = [IsAuthenticated]
 
     def delete(self, request, *args, **kwargs):
-        product_id = kwargs.get('product_id')
-        favorite = Favorite.objects.get(user=request.user, product_id=product_id)
-        favorite.delete()
-        return Response({"message": "Product removed from your favorites list."}, status=status.HTTP_204_NO_CONTENT)
+        product_id = kwargs.get('product')
+        try:
+            favorite = Favorite.objects.get(user=request.user, product_id=product_id)
+            favorite.delete()
+            return Response({"message": "Product removed from your favorites list."}, status=status.HTTP_204_NO_CONTENT)
+        except Favorite.DoesNotExist:
+            return Response({"message": "Favorite not found."}, status=status.HTTP_404_NOT_FOUND)
+
 
 
     serializer_class = PromotionSerializer
@@ -232,7 +237,13 @@ class RemoveFavoriteView(generics.DestroyAPIView):
     
 
 
+class FavoriteListView(generics.ListAPIView):
+    serializer_class = FavoriteSerializer
+    permission_classes = [IsAuthenticated]
 
+    def get_queryset(self):
+        user = self.request.user
+        return Favorite.objects.filter(user=user)
 
 
 
@@ -291,28 +302,89 @@ class RemoveFavoriteView(generics.DestroyAPIView):
 
 
 
-class OrderHistoryView(ListAPIView):
+class OrderDeliveredHistoryView(ListAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = OrderSerializer
     
     def get_queryset(self):
         user = self.request.user
-        queryset = Order.objects.filter(user=user, checkout__shipping_state='delivered').select_related('checkout') | Order.objects.filter(user=user)
+        queryset = Order.objects.filter(user=user,  checkout__shipping_state= "delivered").select_related('checkout') 
+        print(Order.checkout)
+        return queryset
+    
+class OrderPendingHistoryView(ListAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = OrderSerializer
+    
+    def get_queryset(self):
+        user = self.request.user
+        queryset = Order.objects.filter(user=user, checkout__shipping_state='pending').select_related('checkout')
         return queryset
     
   
 
 
-class ShippingHistoryView(generics.ListAPIView):
-    serializer_class = OrderSerializer
+# class ShippingHistoryView(generics.ListAPIView):
+#     serializer_class = OrderSerializer
+
+#     def get_queryset(self):
+#         state = self.request.query_params.get('shipping_state', None)
+#         queryset = Order.objects.all()
+#         if state is not None:
+#             queryset = queryset.filter(checkout__shipping_state=state)
+#         return queryset
+
+
+
+
+
+class UserProfileDetailView(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = UserSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_object(self):
+        return self.request.user
+
+
+class ChangePasswordView(UpdateAPIView):
+    queryset = User.objects.all()
+    permission_classes = [IsAuthenticated]
+    serializer_class = PasswordChangeSerializer
+
+    def get_object(self):
+        return self.request.user
+
+    def update(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        serializer = self.get_serializer(data=request.data)
+
+        if serializer.is_valid():
+            old_password = serializer.data.get("old_password")
+            if not self.object.check_password(old_password):
+                return Response({"old_password": ["Wrong password."]}, status=status.HTTP_400_BAD_REQUEST)
+            self.object.set_password(serializer.data.get("new_password"))
+            self.object.save()
+            return Response({"message": "Password successfully changed."}, status=status.HTTP_204_NO_CONTENT)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class RecommendedProductsView(ListAPIView):
+    serializer_class = ProductSerializer
 
     def get_queryset(self):
-        state = self.request.query_params.get('shipping_state', None)
-        queryset = Order.objects.all()
-        if state is not None:
-            queryset = queryset.filter(checkout__shipping_state=state)
-        return queryset
+        user = self.request.user
+        purchased_products = user.order_set.all().values_list('product_id', flat=True)
+        
+        # Get the categories associated with the purchased products
+        purchased_categories = Product.objects.filter(id__in=purchased_products).values_list('category', flat=True)
+        # Get the recommended products based on the purchased categories
+        recommended_products = Product.objects.filter(category__in=purchased_categories).exclude(id__in=purchased_products)
 
+        # Sort the recommended products by popularity (number of purchases)
+        # recommended_products = recommended_products.annotate(num_purchases=count('order.quantity')).order_by('-num_purchases')
+
+        return recommended_products
 
 class PayPalConfigView(APIView):
     permissions = [AllowAny]
@@ -371,8 +443,6 @@ class VerifyPaymentView(APIView):
         else:
             return JsonResponse({'status': 'Payment verification error'}, status=500)
 
-        
-
 class InitiatePaymentView(APIView):
     permission_classes = [AllowAny]
     """
@@ -401,3 +471,9 @@ class InitiatePaymentView(APIView):
 
         # Return the payment ID to the client, so they can use it to complete the payment on the client side
         return JsonResponse({'paymentId': payment_id})
+        
+class CheckAuthenticationView(APIView):
+    def get(self, request, format=None):
+        authenticated = request.user.is_authenticated
+        return Response({'authenticated': authenticated})
+

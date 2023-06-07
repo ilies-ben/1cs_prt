@@ -50,12 +50,10 @@ class CreateCheckoutWithOrdersView(generics.CreateAPIView):
         data = request.data
 
         checkout_data = {
-            "subtotal": data["subtotal"],
-            "shipping_cost": data["shipping_cost"],
             "total": data["total"],
             "shipping_adress": data["shipping_adress"],
             "payment_method": data["payment_method"],
-            "payment_status": data["payment_status"],
+            "tracking_number": data["tracking_number"],
             "user": request.user.id
         }
         checkout_serializer = self.get_serializer(data=checkout_data)

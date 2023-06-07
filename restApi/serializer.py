@@ -25,14 +25,17 @@ class ProductSerializer(serializers.ModelSerializer):
     category = serializers.CharField(max_length=255)
     description = serializers.CharField(max_length=400)
     discounted_price = serializers.SerializerMethodField()
+    
 
-    class Meta:
-        model = Product
-        fields = '__all__'
-
+    
     # Method to get the discounted price for the product
     def get_discounted_price(self, obj):
         return obj.get_discounted_price()
+    
+    class Meta:
+        model = Product  # Replace "Product" with your actual model name
+        ref_name = 'RestApiProductSerializer'
+        fields = '__all__'
 
 # Serializer for the Category model
 class CategorySerializer(serializers.ModelSerializer):
@@ -60,3 +63,12 @@ class FavoriteSerializer(serializers.ModelSerializer):
 #     class Meta:
 #         model = Shipping
 #         fields = ['state','address']
+
+
+
+class PasswordChangeSerializer(serializers.Serializer):
+    old_password = serializers.CharField(required=True)
+    new_password = serializers.CharField(required=True)
+    confirm_password = serializers.CharField(required=True)
+    class Meta:
+        ref_name = 'RestApiPasswordChangeSerializer'

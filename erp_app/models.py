@@ -144,24 +144,40 @@ class Fournisseur(models.Model):
         return f"{self.nom} {self.prenom}"
 
 
+
+
+
+class Promotion(models.Model):
+    name = models.CharField(max_length=255)
+    start_date = models.DateField()
+    end_date = models.DateField()
+    discount = models.DecimalField(max_digits=5, decimal_places=2, validators=[MinValueValidator(0), MaxValueValidator(1)])
+    def __str__(self):
+        return self.name 
+
+    
+
+
+class Category(models.Model):
+    name = models.CharField(max_length=255)
+    description = models.TextField()
+
+    def __str__(self):
+        return self.name 
+
+
 """ Product model """
 
 class Product(models.Model):
     name = models.CharField(max_length=30)
-    CATEGORIES = [
-        ('Velo', 'Vélo'),
-        ('e-velo', 'Vélo électrique'),
-        ('e-scotter', 'Scooter électrique'),
-        ('Accessoires', 'Accessoires'),
-        ('Matiere 1 ere', 'matiere 1 ere'),
-    ]
-    category = models.CharField(max_length=30, null=True, choices=CATEGORIES)
+
+
+    category = models.ForeignKey(Category, on_delete=models.CASCADE)
+
     description = models.TextField()
     image = models.ImageField(upload_to='produits_images/', default='produits_images/photo_non_dispo.png')
     quantity = models.IntegerField(default=0)
     price = models.DecimalField(max_digits=8, decimal_places=2, default=0)
-    discount=models.IntegerField()
-    sale_price=models.DecimalField(max_digits=10,decimal_places=2)
     created = models.DateField(auto_now_add=True)
     updated = models.DateField(auto_now=True)
     available=models.BooleanField(default=True)
@@ -179,6 +195,20 @@ class Product(models.Model):
             return f"{self.name} , fournisseur : {self.fournisseur.nom } {self.fournisseur.prenom}"
         else:
             return self.name
+        
+    promotion = models.ForeignKey(Promotion, null=True, blank=True, on_delete=models.SET_NULL)
+
+    def get_discounted_price(self):
+        if self.promotion:
+            return self.price - (self.price * self.promotion.discount)
+        else:
+            return self.price
+    # def save(self, *args, **kwargs):
+    #     self.discount = self.get_discounted_price()
+    #     super().save(*args, **kwargs)
+
+    def __str__(self):
+        return self.name 
     class Meta:
         verbose_name_plural = "Products"         
     
@@ -218,15 +248,14 @@ class Checkout(models.Model):
         ('shipped', 'Shipped'),
         ('delivered', 'Delivered'),
     )
+    shipping_state = models.CharField(max_length=20, choices=SHIPPING_STATES, default='pending')
+
     date_checkout= models.DateTimeField(auto_now_add=True)
     complete = models.BooleanField(default=False)
-    #subtotal of the order, before shipping fees are added.
-    subtotal= models.DecimalField(max_digits=10, decimal_places=2)
-    shipping_cost= models.DecimalField(max_digits=10, decimal_places=2)
     # store the total cost of the order, including shipping.
     total= models.DecimalField(max_digits=10, decimal_places=2)
     shipping_adress= models.CharField(max_length=200)
-    shipping_state = models.CharField(max_length=20, choices=SHIPPING_STATES, default='pending')
+    # shipping_state = models.CharField(max_length=20, choices=SHIPPING_STATES, default='pending')
     tracking_number = models.CharField(max_length=100)
     payment_method=models.CharField(max_length=25)
     STATUS=(
@@ -243,6 +272,9 @@ class Checkout(models.Model):
 """ order model """
 
 class Order(models.Model):
+
+    
+
     user=models.ForeignKey(User,on_delete=models.CASCADE)
     product=models.ForeignKey(Product,on_delete=models.CASCADE,related_name='orders',related_query_name='order')
     quantity=models.IntegerField(default=1)  
@@ -297,20 +329,7 @@ class Facture_Showroom(models.Model):
 
 # fin models de showroom 
 
-class Promotion(models.Model):
-    name = models.CharField(max_length=255)
-    start_date = models.DateField()
-    end_date = models.DateField()
-    discount = models.DecimalField(max_digits=5, decimal_places=2, validators=[MinValueValidator(0), MaxValueValidator(1)])
-    def __str__(self):
-        return self.name 
 
-class Category(models.Model):
-    name = models.CharField(max_length=255)
-    description = models.TextField()
-
-    def __str__(self):
-        return self.name 
 
     
 class Favorite(models.Model):
