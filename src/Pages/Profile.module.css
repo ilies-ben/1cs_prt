@@ -1,0 +1,12 @@
+.profileSection{
+    width:100%;
+    height:120%;
+    padding:100px 100px;
+    padding-bottom:200px;
+    /* display:flex;
+    align-items:center;
+    justify-content:center; */
+}
+.formContainer{
+    width:70%;
+}

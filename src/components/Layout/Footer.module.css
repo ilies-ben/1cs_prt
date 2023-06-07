@@ -1,0 +1,70 @@
+.footer{
+    height:auto;
+    padding:50px;
+    font-family:inherit;
+    display:flex;
+    flex-direction:column;
+    justify-content:space-around;
+    align-items:center;
+    color:#fff;
+    background: linear-gradient(-55deg,  rgba(13, 13, 13,.98) 50%, rgba(13, 13, 13,1) 50.1%);
+}
+.footer-content{
+    display: grid;
+    grid-template-columns: repeat(5,minmax(200px,1fr));
+    justify-content: center;
+    align-content:center;
+    gap:40px;
+    margin-top:50px;
+}
+.listcol{
+    display:flex;
+    flex-direction:column;
+    justify-content:flex-start;
+    align-items:flex-start;
+
+}
+.listitems{
+    list-style:none;
+    margin:0;
+    padding:0;
+}
+.item{
+    text-decoration:none;
+    color: rgba(255, 255, 255, 0.85);
+    font-size:15px;
+    transition:all .1s ease-out;
+}
+.item:hover{
+    color: rgba(255, 255, 255, 1);
+}
+.logoft {
+    display: flex;
+    justify-content: center;
+    align-items:center;
+    padding: 0 50px;
+  }
+  .logoImage {
+    width: 10rem;
+    height: 4rem;
+  }
+.col-title{
+    font-size:20px;
+    margin:0;
+    weight:300;
+    margin-bottom:20px;
+}
+.col-item{
+    margin-bottom:10px;
+}
+.borderbt{
+    height:1px;
+    background-color:#fff;
+    width:80%;
+    opacity:0.15;
+    margin-top:100px;
+}
+.cop{
+    color: rgba(255, 255, 255, 0.85);
+    font-size:15px;
+}

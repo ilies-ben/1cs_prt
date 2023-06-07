@@ -1,0 +1,73 @@
+.auth-section{
+    width:100vw;
+    height:100vh;
+    padding:100px 0;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    position:relative;
+    background: radial-gradient(circle at 100% ,rgb(238, 203, 4)  ,rgb(38, 36, 35) 55%);
+}
+.logo{
+    position:absolute;
+    top: 5px;
+    left: 10px;
+    border-bottom:50px;
+}
+img{
+    width:25%;
+}
+.auth-container{
+    display:flex;
+    justify-content:end;
+    width: 800px;
+	max-width: 100%;
+	min-height: 500px;
+    border-radius:5px;
+    background-image:url('../Assets/bike.jpg');
+    background-position:center;
+    background-size:cover;
+    box-shadow: 0 14px 28px rgba(0,0,0,0.25), 
+    0 10px 10px rgba(0,0,0,0.22);
+    border-top:50px;
+}
+
+.form-container{
+    width:40%;
+    min-height:100%;
+    background-color: rgba(255,255,255, 0.1);
+    backdrop-filter: blur(5px);
+    display: flex;
+    text-align: center;
+    align-items: center;
+    flex-direction: column;
+    justify-content: center;
+}
+.content{
+    text-align:center;
+    margin-bottom:35px;
+}
+.content h1{
+    color:#eecb04;
+    margin:0;
+}
+.content p{
+    color:#a4a4a4;
+    font-size:14px;
+}
+.toggle {
+    font-size:14px;
+    font-family:inherit;
+    margin-top: 1rem;
+    background-color: transparent;
+    color: #a4a4a4;
+    border: none;
+    padding: 0.15rem 1.5rem;
+  }
+  .toggle:hover {
+    background-color: transparent;
+    color: #b6b6b6;
+  }  
+.form-content{
+    height:80%;
+}

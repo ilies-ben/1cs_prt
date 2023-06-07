@@ -1,0 +1,17 @@
+.productItem {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+    font-size:16px;
+  }
+  .productImage {
+    width: 50px;
+    height: 50px;
+    margin-right:0.5rem;
+  }
+  .productName {
+    font-weight: bold;
+  }
+  .productPrice {
+    margin-left: auto;
+  }

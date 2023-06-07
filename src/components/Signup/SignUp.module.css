@@ -1,0 +1,48 @@
+.input-100 {
+  width: 80%;
+}
+.input-50 {
+  display: flex;
+}
+.form-container {
+  font-size: 14px;
+  width: 100%;
+  height: auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center;
+}
+
+.genderOp{
+    color:#777777;
+    display:flex;
+    justify-content:space-between;
+    width:80%;
+}
+input[type="radio"] {
+  margin-right: 10px;
+  width: 15px;
+  height: 15px;
+}
+
+label {
+  font-size: 16px;
+  cursor: pointer;
+}
+.option {
+  color:#777;
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+
+.radio {
+  width: 24px;
+  height: 24px;
+  margin-right: 1rem;
+  background-color: black !important;
+  border-radius: 50%;
+}
+

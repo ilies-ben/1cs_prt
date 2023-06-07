@@ -1,0 +1,24 @@
+.product-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin-bottom: 10px;
+  }
+  
+  .size-dropdown-box {
+    display: flex;
+    justify-content:space-between;
+    align-items: center;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding:  5px 20px ;
+  }
+  
+  .size-dropdown-box select {
+    margin-right: 10px;
+  }
+  
+  .size-selection {
+    font-size: 14px;
+    font-weight: bold;
+  }

@@ -1,0 +1,42 @@
+.cart-container{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    width:70%;
+}
+.content{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+.img-container{
+    width:80px;
+    height:80px;
+    background-image:url("../../Assets/Charger.png");
+    background-position:center;
+    background-size:cover;
+}
+.cart-item-quantity {
+    display: flex;
+  }
+  
+  .cart-item-reduce,
+  .cart-item-plus {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 30px;
+    height: 30px;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 50%;
+    font-size: 20px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-right: 10px;
+  }
+  
+  .cart-item-reduce:hover,
+  .cart-item-plus:hover {
+    background-color: #f5f5f5;
+  }

@@ -1,0 +1,13 @@
+.action {
+  font-family:inherit;
+    color:#000;
+    cursor: pointer;
+    background-color:#d6b603;
+    padding: 0.5rem 3rem;
+    border: 1px solid #eecb04;
+    border-radius: 2px;
+  }
+   .action:hover,
+   .action:active {
+    background-color: #efd01d;
+  }

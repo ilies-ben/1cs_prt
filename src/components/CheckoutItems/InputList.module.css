@@ -1,0 +1,28 @@
+.checkout-form{
+    min-width:400px;
+}
+label {
+    display: block;
+    margin-bottom:5px;
+    color:#939393;
+    font-size:14px;
+  }
+  
+  label span.required {
+    color: red;
+  }
+  
+  .inputItem{
+    background-color:#F5F5F5;
+    display: block;
+    width: 100%;
+    padding: 8px 12px;
+    font-size: 16px;
+    border-radius: 4px;
+    box-sizing: border-box;
+    border:none;
+    margin-bottom:15px;
+  }
+  .inputItem:focus {
+    outline: none;
+  }

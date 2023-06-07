@@ -1,0 +1,17 @@
+.contentContainer{
+    min-width:400px;
+}
+.borderLine{
+    width:100%;
+    height:1px;
+    background-color:rgba(0,0,0,0.2);
+    margin-bottom:32px;
+}
+.giftCode{
+    margin:15px 0;
+    width:100%;
+    display:flex;
+    gap:20px;
+    justify-content:space-between;
+    align-items:center;
+}

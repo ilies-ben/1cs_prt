@@ -1,0 +1,35 @@
+.couponCode {
+  position: relative;
+}
+
+.input {
+  padding: 0.5rem;
+  font-size: 1rem;
+  border: 1px solid black;
+  border-radius: 0.25rem;
+ margin:0 !important;
+}
+
+.label {
+  position: absolute;
+  top: 50%;
+  left: 0.5rem;
+  transform: translateY(-50%);
+  font-size: 0.8rem;
+  color: #aaa;
+  transition: all 0.2s ease-in-out;
+}
+
+.input:focus::placeholder,
+.input:not(:placeholder-shown)::placeholder {
+  color: transparent;
+}
+
+.input:focus + .label,
+.input:not(:placeholder-shown) + .label {
+  top: 0;
+  left: 0;
+  transform: translate(0, -100%);
+  font-size: 0.6rem;
+  color: black;
+}
