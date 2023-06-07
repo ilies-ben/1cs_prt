@@ -25,6 +25,7 @@ class ProductSerializer(serializers.ModelSerializer):
     category = serializers.CharField(max_length=255)
     description = serializers.CharField(max_length=400)
     discounted_price = serializers.SerializerMethodField()
+    
 
     
     # Method to get the discounted price for the product

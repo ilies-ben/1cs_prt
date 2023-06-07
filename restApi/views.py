@@ -195,28 +195,34 @@ class CategoryProductList(generics.ListAPIView):
 
 class AddFavoriteView(generics.CreateAPIView):
     serializer_class = FavoriteSerializer
-    authentication_classes = [SessionAuthentication, BasicAuthentication]
     permission_classes = [IsAuthenticated]
 
     def post(self, request, *args, **kwargs):
-        product_id = request.data.get('product_id')
+        product_id = request.data.get('product')
         if Favorite.objects.filter(user=request.user, product_id=product_id).exists():
             return Response({"message": "This product is already in your favorites list."}, status=status.HTTP_400_BAD_REQUEST)
+        
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save(user=request.user)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
+
+
 class RemoveFavoriteView(generics.DestroyAPIView):
     queryset = Favorite.objects.all()
-    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    serializer_class = FavoriteSerializer
     permission_classes = [IsAuthenticated]
 
     def delete(self, request, *args, **kwargs):
-        product_id = kwargs.get('product_id')
-        favorite = Favorite.objects.get(user=request.user, product_id=product_id)
-        favorite.delete()
-        return Response({"message": "Product removed from your favorites list."}, status=status.HTTP_204_NO_CONTENT)
+        product_id = kwargs.get('product')
+        try:
+            favorite = Favorite.objects.get(user=request.user, product_id=product_id)
+            favorite.delete()
+            return Response({"message": "Product removed from your favorites list."}, status=status.HTTP_204_NO_CONTENT)
+        except Favorite.DoesNotExist:
+            return Response({"message": "Favorite not found."}, status=status.HTTP_404_NOT_FOUND)
+
 
 
     serializer_class = PromotionSerializer
@@ -227,7 +233,13 @@ class RemoveFavoriteView(generics.DestroyAPIView):
     
 
 
+class FavoriteListView(generics.ListAPIView):
+    serializer_class = FavoriteSerializer
+    permission_classes = [IsAuthenticated]
 
+    def get_queryset(self):
+        user = self.request.user
+        return Favorite.objects.filter(user=user)
 
 
 
@@ -292,7 +304,8 @@ class OrderDeliveredHistoryView(ListAPIView):
     
     def get_queryset(self):
         user = self.request.user
-        queryset = Order.objects.filter(user=user, shipping_state='delivered')
+        queryset = Order.objects.filter(user=user, shipping_state= "delivered")
+        print(queryset)
         return queryset
     
 class OrderPendingHistoryView(ListAPIView):
