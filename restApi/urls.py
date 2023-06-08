@@ -4,7 +4,7 @@ from .views import *
 
 urlpatterns = [
     path('all-products/',views.Productcreate.as_view(),name ='get'),
-     path('create/',views.Productcreate.as_view(),name ='create'),
+    path('create/',views.Productcreate.as_view(),name ='create'),
     path('product/<int:id>/', views.ProductDetail.as_view(), name=' get product_detail'),
     path('update/<int:id>/', views.ProductDetail.as_view(), name=' update product_detail'),
     path('delete/<int:id>/', views.ProductDetail.as_view(), name=' delete product_detail'),
@@ -35,8 +35,10 @@ urlpatterns = [
     path('check-authentication/', CheckAuthenticationView.as_view(), name='check-authentication'),
     path('favorites/', FavoriteListView.as_view(), name='favorite-list'),
     
-    
-    
+    path('paypal-config/', PayPalConfigView.as_view(), name='paypal-config'),
+    path('initiate-payment/', InitiatePaymentView.as_view(), name='initiate_payment'),
+    path('verify-payment/', VerifyPaymentView.as_view(), name='verify_payment'),
+
     ]
 
 

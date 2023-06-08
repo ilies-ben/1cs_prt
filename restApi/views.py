@@ -23,8 +23,12 @@ from rest_framework import filters
 from . import permission
 from restApi.permission import *
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 
+from django.views import View
+from django.http import JsonResponse
+from django.conf import settings
+import uuid
 
 # Product views:
 
@@ -374,7 +378,6 @@ class RecommendedProductsView(ListAPIView):
         
         # Get the categories associated with the purchased products
         purchased_categories = Product.objects.filter(id__in=purchased_products).values_list('category', flat=True)
-
         # Get the recommended products based on the purchased categories
         recommended_products = Product.objects.filter(category__in=purchased_categories).exclude(id__in=purchased_products)
 
@@ -383,8 +386,94 @@ class RecommendedProductsView(ListAPIView):
 
         return recommended_products
 
+class PayPalConfigView(APIView):
+    permissions = [AllowAny]
+    """
+    This view will return the PayPal client ID.
+    """
+    def get(self, request, *args, **kwargs):
+        return JsonResponse({'client_id': settings.PAYPAL_CLIENT_ID})
 
+
+class VerifyPaymentView(APIView):
+    """
+    This view will be called once the payment has been completed on the client side.
+    It will verify the payment with PayPal and update the checkout and PayPalPayment in your database.
+    """
+    permission_classes = [AllowAny]
+    def post(self, request, *args, **kwargs):
+        payment_id = request.data.get('paymentId')
+        payer_id = request.data.get('PayerID')
+
+        # Define URL and headers for PayPal API
+        paypal_url = f"https://api-m.sandbox.paypal.com/v1/payments/payment/{payment_id}"
+        headers = {
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {settings.PAYPAL_CLIENT_SECRET}"
+        }
+
+        # Make a GET request to the PayPal API
+        response = requests.get(paypal_url, headers=headers)
+        
+        # Handle the response
+        if response.status_code == 200:
+            data = response.json()
+            if data['state'] == 'approved':
+                # Update the checkout in your database
+                try:
+                    checkout = Checkout.objects.get(payment_id=payment_id)
+                    checkout.status = 'Paid'  # Update the status field of the Checkout model
+                    checkout.save()
+
+                    # Update PayPalPayment in your database
+                    paypal_payment = PayPalPayment.objects.get(payment_id=payment_id)
+                    paypal_payment.status = 'Completed'
+                    paypal_payment.save()
+
+                    return JsonResponse({'status': 'success'})
+                except (Checkout.DoesNotExist, PayPalPayment.DoesNotExist):
+                    return JsonResponse({'status': 'Checkout or payment not found'}, status=400)
+            else:
+                # Update PayPalPayment in your database
+                paypal_payment = PayPalPayment.objects.get(payment_id=payment_id)
+                paypal_payment.status = 'Failed'
+                paypal_payment.save()
+
+                return JsonResponse({'status': 'Payment failed'}, status=400)
+        else:
+            return JsonResponse({'status': 'Payment verification error'}, status=500)
+
+class InitiatePaymentView(APIView):
+    permission_classes = [AllowAny]
+    """
+    This view will be called when the client wants to initiate a payment.
+    It will associate a PayPalPayment entry with an existing checkout in your database.
+    """
+    def post(self, request, *args, **kwargs):
+        # Get the checkout ID from the POST request
+        checkout_id = request.data.get('checkout_id')
+
+        try:
+            # Retrieve the corresponding checkout
+            checkout = Checkout.objects.get(id=checkout_id)
+        except Checkout.DoesNotExist:
+            return JsonResponse({'error': 'Invalid checkout ID'}, status=400)
+
+        # Note: Ideally, you would get the payment_id from the PayPal API when you create a payment
+        # Here, we're just generating a random one for demonstration purposes
+        payment_id = str(uuid.uuid4())
+
+        paypal_payment = PayPalPayment.objects.create(
+            payment_id=payment_id,
+            checkout=checkout,
+            status='Initiated'  # Update this field with your appropriate payment status
+        )
+
+        # Return the payment ID to the client, so they can use it to complete the payment on the client side
+        return JsonResponse({'paymentId': payment_id})
+        
 class CheckAuthenticationView(APIView):
     def get(self, request, format=None):
         authenticated = request.user.is_authenticated
         return Response({'authenticated': authenticated})
+

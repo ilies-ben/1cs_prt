@@ -252,9 +252,6 @@ class Checkout(models.Model):
 
     date_checkout= models.DateTimeField(auto_now_add=True)
     complete = models.BooleanField(default=False)
-    #subtotal of the order, before shipping fees are added.
-    subtotal= models.DecimalField(max_digits=10, decimal_places=2)
-    shipping_cost= models.DecimalField(max_digits=10, decimal_places=2)
     # store the total cost of the order, including shipping.
     total= models.DecimalField(max_digits=10, decimal_places=2)
     shipping_adress= models.CharField(max_length=200)
@@ -342,3 +339,14 @@ class Favorite(models.Model):
     def __str__(self):
         return f"{self.user.username}'s favorite list"
 
+class PayPalPayment(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    order = models.ForeignKey(Order, on_delete=models.CASCADE)
+    payment_id = models.CharField(max_length=255)
+    payer_id = models.CharField(max_length=255)
+    status = models.CharField(max_length=255, choices=(('completed', 'Completed'), ('pending', 'Pending'), ('failed', 'Failed')), default='pending')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.user.username}'s payment : {self.status}"
