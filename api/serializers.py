@@ -1,5 +1,5 @@
 from dj_rest_auth.registration.serializers import RegisterSerializer
-from dj_rest_auth.serializers import LoginSerializer , PasswordResetSerializer , UserDetailsSerializer 
+from dj_rest_auth.serializers import LoginSerializer  , UserDetailsSerializer ,PasswordResetSerializer
 from rest_framework import serializers
 from erp_app.models import *
 from allauth.account.utils import setup_user_email
@@ -11,6 +11,7 @@ from django.core.validators import RegexValidator
 from django.utils.translation import gettext_lazy as _
 from django.contrib.auth import get_user_model,authenticate
 from dj_rest_auth.models import TokenModel
+from restApi.serializer import *
 
 try:
     from allauth.account.adapter import get_adapter
@@ -140,16 +141,20 @@ class UserListSerializer(serializers.ModelSerializer):
         ]
         exclude = ("password","groups", "user_permissions")
 
+
 class ProductSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Product
-        fields =['id', 'name', 'price', 'category', 'description', 'image']
+   class Meta:
+       model = Product
+       fields = '__all__'
+class Meta:
+         ref_name = 'ApiProductSerializer' 
+
 
 class ReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Review
         fields = '__all__'
-
+ 
 class OrderSerializer(serializers.ModelSerializer):
     product = ProductSerializer(read_only=True)
 
