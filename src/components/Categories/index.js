@@ -5,7 +5,7 @@ const Categories = () => {
   const [categories, setCategories] = useState([])
   useEffect(() => {
     const fetchCategories = async () => {
-      const response = await fetch('https://fakestoreapi.com/products/categories')
+      const response = await fetch('http://127.0.0.1:8000/api/categories/')
       const data = await response.json()
       setCategories(data)
     }

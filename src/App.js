@@ -18,7 +18,7 @@ function App() {
       <Route path="/products" element={<ProductPage/>}></Route>
       <Route path="/products/:id" element={<Product/>} />
       <Route path="/myProfile" element={<Profile/>} />
-      <Route path="/myWhishlist" element={<WishlistPage/>} ></Route>
+      <Route path="/myWishlist" element={<WishlistPage/>} ></Route>
       <Route path="/categories/:name" element={<CategoryProducts/>} />
     </Routes> 
   );

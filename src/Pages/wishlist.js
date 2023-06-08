@@ -12,10 +12,11 @@ const WishlistPage = () => {
   }, []);
 
   return (
-    <div>
-      <h1>Wishlist</h1>
+    <div className='w-full h-screen py-44 px-5'>
+      <h1 className='text-xl font-semibold'>My Wishlist</h1>
       {wishlist.length === 0 ? (
-        <p>Your wishlist is empty.</p>
+        <div className='flex items-center justify-center'><p className='text-lg'>Your wishlist is empty.</p></div>
+        
       ) : (
         <ProductCard products={wishlist} />
       )}

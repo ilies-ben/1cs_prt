@@ -42,8 +42,8 @@ const ProductCard = ({ products = [] }) => {
       <div className="container px-5 py-24 mx-auto">
         <div className="flex flex-wrap -m-4">
           {products.map((product) => {
-            const { id, name, price, description, category, image, discount } = product;
-            const discountedPrice = price - (price * (discount / 100)); // Calculate discounted price
+            const { id, name, price, description, category, image,discounted_price} = product;
+            
 
             return (
               <div
@@ -52,19 +52,15 @@ const ProductCard = ({ products = [] }) => {
               >
                 <Link to={`/products/${id}`} className="block relative h-48 rounded overflow-hidden">
                   <img alt={name} className="object-contain object-center w-full h-full block" src={image} />
-                  {discount > 0 && (
-                    <div className="absolute top-2 left-2 bg-red-500 text-white px-2 py-1 rounded-md text-sm">
-                      {discount}% off
-                    </div>
-                  )}
+                  
                 </Link>
                 <div className="mt-4">
                   <h3 className="text-gray-500 text-xs tracking-widest title-font mb-1 uppercase">{category}</h3>
                   <h2 className="text-gray-900 title-font text-lg font-medium">{name}</h2>
-                  {discount > 0 ? (
-                    <div className="flex items-center mt-1">
-                      <p className="text-gray-500 line-through mr-2">{price} DA</p>
-                      <p className="text-md font-semibold">{discountedPrice} DA</p>
+                  {price !== discounted_price ? (
+                    <div className="flex items-start flex-col mt-1">
+                      <p className="text-red-400 line-through mr-2">{price} DA</p>
+                      <p className="text-md text-green-600 font-semibold">{discounted_price} DA</p>
                     </div>
                   ) : (
                     <p className="mt-1 text-md font-semibold">{price} DA</p>

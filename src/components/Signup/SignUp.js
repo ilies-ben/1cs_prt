@@ -55,7 +55,7 @@ function SignUp() {
         }
       );
       console.log(response?.data?.key);
-      navigate("/login")
+      navigate("/auth")
       setSuccess(true);
     } catch (error) {
       console.log(error);

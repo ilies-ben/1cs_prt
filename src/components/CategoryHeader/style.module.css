@@ -1,0 +1,23 @@
+.productHeader{
+    border-bottom: 2px solid #e5e5e5;
+    display: flex;
+    justify-content: space-between;
+    align-items:baseline;
+    position: relative;
+    padding: 0 0 15px;
+ }
+ .productHeader h1{
+    color: #000;
+    font-weight: 500;
+    font-size: 200%;
+ }
+ .productHeader h1::before{
+    content: "";
+    height: 2px;
+    width: 120px;
+    display: block;
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    background: #eb9e2a;
+ }
